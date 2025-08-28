@@ -23,9 +23,13 @@ partial class Form1
     private ToolStripMenuItem addContactToolStripMenuItem;
     private ToolStripMenuItem editContactToolStripMenuItem;
     private ToolStripMenuItem deleteContactToolStripMenuItem;
+    private ToolStripMenuItem importExcelToolStripMenuItem;
+    private ToolStripMenuItem exportExcelToolStripMenuItem;
     private Panel panelButtons;
     private StatusStrip statusStrip1;
     private ToolStripStatusLabel toolStripStatusLabel1;
+    private TextBox textBoxSearch;
+    private Label labelSearch;
 
     /// <summary>
     ///  Clean up any resources being used.
@@ -66,9 +70,13 @@ partial class Form1
         this.addContactToolStripMenuItem = new ToolStripMenuItem();
         this.editContactToolStripMenuItem = new ToolStripMenuItem();
         this.deleteContactToolStripMenuItem = new ToolStripMenuItem();
+        this.importExcelToolStripMenuItem = new ToolStripMenuItem();
+        this.exportExcelToolStripMenuItem = new ToolStripMenuItem();
         this.panelButtons = new Panel();
         this.statusStrip1 = new StatusStrip();
         this.toolStripStatusLabel1 = new ToolStripStatusLabel();
+        this.textBoxSearch = new TextBox();
+        this.labelSearch = new Label();
 
         ((System.ComponentModel.ISupportInitialize)(this.dataGridViewContacts)).BeginInit();
         this.menuStrip1.SuspendLayout();
@@ -81,7 +89,9 @@ partial class Form1
         // 
         this.menuStrip1.Items.AddRange(new ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.editToolStripMenuItem});
+            this.editToolStripMenuItem,
+            this.importExcelToolStripMenuItem,
+            this.exportExcelToolStripMenuItem});
         this.menuStrip1.Location = new Point(0, 0);
         this.menuStrip1.Name = "menuStrip1";
         this.menuStrip1.Size = new Size(1000, 24);
@@ -92,8 +102,6 @@ partial class Form1
         // fileToolStripMenuItem
         // 
         this.fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] {
-            this.importToolStripMenuItem,
-            this.exportToolStripMenuItem,
             this.saveToDbToolStripMenuItem,
             this.exitToolStripMenuItem});
         this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
@@ -168,18 +176,34 @@ partial class Form1
         this.deleteContactToolStripMenuItem.Click += new EventHandler(this.ButtonDelete_Click);
 
         // 
+        // importExcelToolStripMenuItem
+        // 
+        this.importExcelToolStripMenuItem.Name = "importExcelToolStripMenuItem";
+        this.importExcelToolStripMenuItem.Size = new Size(88, 20);
+        this.importExcelToolStripMenuItem.Text = "&Import Excel";
+        this.importExcelToolStripMenuItem.Click += new EventHandler(this.ButtonImport_Click);
+
+        // 
+        // exportExcelToolStripMenuItem
+        // 
+        this.exportExcelToolStripMenuItem.Name = "exportExcelToolStripMenuItem";
+        this.exportExcelToolStripMenuItem.Size = new Size(87, 20);
+        this.exportExcelToolStripMenuItem.Text = "E&xport Excel";
+        this.exportExcelToolStripMenuItem.Click += new EventHandler(this.ButtonExport_Click);
+
+        // 
         // panelButtons
         // 
+        this.panelButtons.Controls.Add(this.labelSearch);
+        this.panelButtons.Controls.Add(this.textBoxSearch);
         this.panelButtons.Controls.Add(this.buttonAdd);
         this.panelButtons.Controls.Add(this.buttonEdit);
         this.panelButtons.Controls.Add(this.buttonDelete);
-        this.panelButtons.Controls.Add(this.buttonImport);
-        this.panelButtons.Controls.Add(this.buttonExport);
         this.panelButtons.Controls.Add(this.buttonSaveToDb);
         this.panelButtons.Dock = DockStyle.Top;
         this.panelButtons.Location = new Point(0, 24);
         this.panelButtons.Name = "panelButtons";
-        this.panelButtons.Size = new Size(1000, 50);
+        this.panelButtons.Size = new Size(1000, 100);
         this.panelButtons.TabIndex = 1;
 
         // 
@@ -216,37 +240,35 @@ partial class Form1
         this.buttonDelete.Click += new EventHandler(this.ButtonDelete_Click);
 
         // 
-        // buttonImport
-        // 
-        this.buttonImport.Location = new Point(370, 12);  // Adjusted position to account for wider Delete button
-        this.buttonImport.Name = "buttonImport";
-        this.buttonImport.Size = new Size(100, 30);
-        this.buttonImport.TabIndex = 3;
-        this.buttonImport.Text = "&Import Excel";
-        this.buttonImport.UseVisualStyleBackColor = true;
-        this.buttonImport.Click += new EventHandler(this.ButtonImport_Click);
-
-        // 
-        // buttonExport
-        // 
-        this.buttonExport.Location = new Point(476, 12);  // Adjusted position to account for wider Delete button
-        this.buttonExport.Name = "buttonExport";
-        this.buttonExport.Size = new Size(100, 30);
-        this.buttonExport.TabIndex = 4;
-        this.buttonExport.Text = "E&xport Excel";
-        this.buttonExport.UseVisualStyleBackColor = true;
-        this.buttonExport.Click += new EventHandler(this.ButtonExport_Click);
-
-        // 
         // buttonSaveToDb
         // 
-        this.buttonSaveToDb.Location = new Point(582, 12);
+        this.buttonSaveToDb.Location = new Point(370, 12);
         this.buttonSaveToDb.Name = "buttonSaveToDb";
         this.buttonSaveToDb.Size = new Size(120, 30);
         this.buttonSaveToDb.TabIndex = 5;
         this.buttonSaveToDb.Text = "&Save to Database";
         this.buttonSaveToDb.UseVisualStyleBackColor = true;
         this.buttonSaveToDb.Click += new EventHandler(this.ButtonSaveToDb_Click);
+
+        // 
+        // labelSearch
+        // 
+        this.labelSearch.AutoSize = true;
+        this.labelSearch.Location = new Point(510, 20);
+        this.labelSearch.Name = "labelSearch";
+        this.labelSearch.Size = new Size(45, 15);
+        this.labelSearch.TabIndex = 6;
+        this.labelSearch.Text = "Search:";
+
+        // 
+        // textBoxSearch
+        // 
+        this.textBoxSearch.Location = new Point(560, 17);
+        this.textBoxSearch.Name = "textBoxSearch";
+        this.textBoxSearch.PlaceholderText = "Enter name or surname...";
+        this.textBoxSearch.Size = new Size(200, 23);
+        this.textBoxSearch.TabIndex = 7;
+        this.textBoxSearch.TextChanged += new EventHandler(this.TextBoxSearch_TextChanged);
 
         // 
         // dataGridViewContacts
@@ -256,13 +278,13 @@ partial class Form1
         this.dataGridViewContacts.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         this.dataGridViewContacts.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
         this.dataGridViewContacts.Dock = DockStyle.Fill;
-        this.dataGridViewContacts.Location = new Point(0, 74);
+        this.dataGridViewContacts.Location = new Point(0, 124);
         this.dataGridViewContacts.MultiSelect = false;
         this.dataGridViewContacts.Name = "dataGridViewContacts";
         this.dataGridViewContacts.EditMode = DataGridViewEditMode.EditOnEnter;
         this.dataGridViewContacts.RowHeadersWidth = 25;
         this.dataGridViewContacts.SelectionMode = DataGridViewSelectionMode.CellSelect;
-        this.dataGridViewContacts.Size = new Size(1000, 584);
+        this.dataGridViewContacts.Size = new Size(1000, 534);
         this.dataGridViewContacts.TabIndex = 2;
         this.dataGridViewContacts.ColumnHeaderMouseClick += new DataGridViewCellMouseEventHandler(this.DataGridViewContacts_ColumnHeaderMouseClick);
         this.dataGridViewContacts.DoubleClick += new EventHandler(this.ButtonEdit_Click);

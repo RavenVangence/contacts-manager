@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GeniusContactManager")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+114fba2db765e0a6795648bcbb69eb5e0d1d0ead")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ac08277a88fb894ad94b19d8ba1fb5472d44de95")]
 [assembly: System.Reflection.AssemblyProductAttribute("GeniusContactManager")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GeniusContactManager")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

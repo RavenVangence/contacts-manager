@@ -11,6 +11,7 @@ public partial class Form1 : Form
     private readonly ContactContext _context;
     private readonly ExcelService _excelService;
     private List<Contact> _currentContacts = new();
+    private List<Contact> _allContacts = new(); // Store all contacts for filtering
     private string _sortColumn = "Name";
     private bool _sortAscending = true;
     private bool _columnsInitialized = false;
@@ -51,6 +52,9 @@ public partial class Form1 : Form
         dataGridViewContacts.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None;
         dataGridViewContacts.AllowUserToResizeRows = false;
         dataGridViewContacts.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        // Remove default selection colors to allow individual column styling
+        dataGridViewContacts.DefaultCellStyle.SelectionBackColor = Color.Transparent;
+        dataGridViewContacts.DefaultCellStyle.SelectionForeColor = Color.Black;
 
         // Clear existing columns
         dataGridViewContacts.Columns.Clear();
@@ -64,7 +68,12 @@ public partial class Form1 : Form
                 DataPropertyName = "Name",
                 HeaderText = "Name",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-                FillWeight = 30
+                FillWeight = 30,
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    SelectionBackColor = Color.Transparent,
+                    SelectionForeColor = Color.Black
+                }
             },
             new DataGridViewTextBoxColumn
             {
@@ -72,7 +81,12 @@ public partial class Form1 : Form
                 DataPropertyName = "Surname",
                 HeaderText = "Surname",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-                FillWeight = 30
+                FillWeight = 30,
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    SelectionBackColor = Color.Transparent,
+                    SelectionForeColor = Color.Black
+                }
             },
             new DataGridViewTextBoxColumn
             {
@@ -80,7 +94,12 @@ public partial class Form1 : Form
                 DataPropertyName = "PhoneNumber",
                 HeaderText = "Phone Number",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-                FillWeight = 30
+                FillWeight = 30,
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    SelectionBackColor = Color.Transparent,
+                    SelectionForeColor = Color.Black
+                }
             },
             new DataGridViewCheckBoxColumn
             {
@@ -88,7 +107,13 @@ public partial class Form1 : Form
                 DataPropertyName = "Used",
                 HeaderText = "Used",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-                FillWeight = 10
+                FillWeight = 10,
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    SelectionBackColor = Color.Transparent,
+                    SelectionForeColor = Color.Black,
+                    Alignment = DataGridViewContentAlignment.MiddleCenter
+                }
             }
         });
 
@@ -105,7 +130,8 @@ public partial class Form1 : Form
     {
         try
         {
-            _currentContacts = _context.Contacts.OrderBy(GetSortExpression()).ToList();
+            _allContacts = _context.Contacts.OrderBy(GetSortExpression()).ToList();
+            _currentContacts = new List<Contact>(_allContacts);
             RefreshDataGridView();
         }
         catch (Exception ex)
@@ -269,6 +295,7 @@ public partial class Form1 : Form
             form.Contact.ModifiedDate = DateTime.Now;
 
             // Add to the in-memory list only, don't save to database
+            _allContacts.Add(form.Contact);
             _currentContacts.Add(form.Contact);
             RefreshDataGridView();
 
@@ -310,6 +337,7 @@ public partial class Form1 : Form
             if (result == DialogResult.Yes)
             {
                 // Remove from in-memory list only, don't delete from database yet
+                _allContacts.Remove(selectedContact);
                 _currentContacts.Remove(selectedContact);
                 RefreshDataGridView();
 
@@ -386,6 +414,7 @@ public partial class Form1 : Form
                     }
 
                     // Add valid contacts to the in-memory list only, don't save to database
+                    _allContacts.AddRange(validContacts);
                     _currentContacts.AddRange(validContacts);
                     RefreshDataGridView();
 
@@ -535,6 +564,9 @@ public partial class Form1 : Form
                 _context.SaveChanges();
                 LoadContacts(); // Refresh from database
 
+                // Clear the search to show all results after save
+                textBoxSearch.Text = string.Empty;
+
                 var message = $"Save complete!\n";
                 if (savedCount > 0) message += $"New contacts saved: {savedCount}\n";
                 if (updatedCount > 0) message += $"Existing contacts updated: {updatedCount}\n";
@@ -586,6 +618,46 @@ public partial class Form1 : Form
             // Optionally show a user-friendly message
             // MessageBox.Show("An error occurred while updating the contact. Please try again.", "Error", 
             //     MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+    }
+
+    private void TextBoxSearch_TextChanged(object? sender, EventArgs e)
+    {
+        FilterContacts();
+    }
+
+    private void FilterContacts()
+    {
+        try
+        {
+            var searchText = textBoxSearch.Text?.Trim() ?? string.Empty;
+
+            if (string.IsNullOrEmpty(searchText))
+            {
+                // Show all contacts if search is empty
+                _currentContacts = new List<Contact>(_allContacts);
+            }
+            else
+            {
+                // Filter contacts by name or surname (case insensitive)
+                _currentContacts = _allContacts.Where(c =>
+                    (c.Name?.Contains(searchText, StringComparison.OrdinalIgnoreCase) == true) ||
+                    (c.Surname?.Contains(searchText, StringComparison.OrdinalIgnoreCase) == true)
+                ).ToList();
+            }
+
+            // Apply current sorting to filtered results
+            var sortExpression = GetSortExpression();
+            _currentContacts = _sortAscending
+                ? _currentContacts.OrderBy(sortExpression).ToList()
+                : _currentContacts.OrderByDescending(sortExpression).ToList();
+
+            RefreshDataGridView();
+        }
+        catch (Exception ex)
+        {
+            // Log the error but don't crash the application
+            System.Diagnostics.Debug.WriteLine($"Error in FilterContacts: {ex.Message}");
         }
     }
 
