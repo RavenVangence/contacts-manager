@@ -21,14 +21,41 @@ namespace GeniusContactManager.Services
             if (rowCount <= 1) // No data rows (only header)
                 return contacts;
 
+            // Check headers to determine column structure
+            var headers = new Dictionary<string, int>();
+            var lastColumnUsed = worksheet.LastColumnUsed()?.ColumnNumber() ?? 0;
+
+            for (int col = 1; col <= lastColumnUsed; col++)
+            {
+                var headerValue = worksheet.Cell(1, col).Value.ToString()?.Trim().ToLower();
+                if (!string.IsNullOrEmpty(headerValue))
+                {
+                    headers[headerValue] = col;
+                }
+            }
+
+            // Determine column positions
+            int nameCol = headers.ContainsKey("name") ? headers["name"] : 1;
+            int surnameCol = headers.ContainsKey("surname") ? headers["surname"] : 2;
+            int phoneCol = headers.ContainsKey("phone number") || headers.ContainsKey("phone") ?
+                          (headers.ContainsKey("phone number") ? headers["phone number"] : headers["phone"]) : 3;
+            int usedCol = headers.ContainsKey("used") ? headers["used"] : -1; // -1 means doesn't exist
+
+            bool hasUsedColumn = usedCol != -1;
+
             // Read data starting from row 2 (assuming row 1 has headers)
             for (int row = 2; row <= rowCount; row++)
             {
-                // Map columns based on simplified structure
-                var name = worksheet.Cell(row, 1).Value.ToString()?.Trim();
-                var surname = worksheet.Cell(row, 2).Value.ToString()?.Trim();
-                var phoneNumber = worksheet.Cell(row, 3).Value.ToString()?.Trim();
-                var usedValue = worksheet.Cell(row, 4).Value.ToString()?.Trim();
+                // Map columns based on detected structure
+                var name = worksheet.Cell(row, nameCol).Value.ToString()?.Trim();
+                var surname = worksheet.Cell(row, surnameCol).Value.ToString()?.Trim();
+                var phoneNumber = worksheet.Cell(row, phoneCol).Value.ToString()?.Trim();
+
+                string? usedValue = null;
+                if (hasUsedColumn)
+                {
+                    usedValue = worksheet.Cell(row, usedCol).Value.ToString()?.Trim();
+                }
 
                 // Skip empty rows
                 if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(surname))
@@ -38,8 +65,8 @@ namespace GeniusContactManager.Services
                 {
                     Name = name ?? "",
                     Surname = surname ?? "",
-                    PhoneNumber = phoneNumber,
-                    Used = ParseBooleanValue(usedValue),
+                    PhoneNumber = phoneNumber ?? "",
+                    Used = hasUsedColumn ? ParseBooleanValue(usedValue) : false, // Set to false if no Used column
                     CreatedDate = DateTime.Now
                 };
 
@@ -120,13 +147,40 @@ namespace GeniusContactManager.Services
             if (rowCount <= 1)
                 return contacts;
 
-            // Import from sa_contacts.xlsx format (simplified)
+            // Check headers to determine column structure
+            var headers = new Dictionary<string, int>();
+            var lastColumnUsed = worksheet.LastColumnUsed()?.ColumnNumber() ?? 0;
+
+            for (int col = 1; col <= lastColumnUsed; col++)
+            {
+                var headerValue = worksheet.Cell(1, col).Value.ToString()?.Trim().ToLower();
+                if (!string.IsNullOrEmpty(headerValue))
+                {
+                    headers[headerValue] = col;
+                }
+            }
+
+            // Determine column positions
+            int nameCol = headers.ContainsKey("name") ? headers["name"] : 1;
+            int surnameCol = headers.ContainsKey("surname") ? headers["surname"] : 2;
+            int phoneCol = headers.ContainsKey("phone number") || headers.ContainsKey("phone") ?
+                          (headers.ContainsKey("phone number") ? headers["phone number"] : headers["phone"]) : 3;
+            int usedCol = headers.ContainsKey("used") ? headers["used"] : -1; // -1 means doesn't exist
+
+            bool hasUsedColumn = usedCol != -1;
+
+            // Import from sa_contacts.xlsx format (with dynamic column detection)
             for (int row = 2; row <= rowCount; row++)
             {
-                var name = worksheet.Cell(row, 1).Value.ToString()?.Trim();
-                var surname = worksheet.Cell(row, 2).Value.ToString()?.Trim();
-                var phoneNumber = worksheet.Cell(row, 3).Value.ToString()?.Trim();
-                var usedValue = worksheet.Cell(row, 4).Value.ToString()?.Trim();
+                var name = worksheet.Cell(row, nameCol).Value.ToString()?.Trim();
+                var surname = worksheet.Cell(row, surnameCol).Value.ToString()?.Trim();
+                var phoneNumber = worksheet.Cell(row, phoneCol).Value.ToString()?.Trim();
+
+                string? usedValue = null;
+                if (hasUsedColumn)
+                {
+                    usedValue = worksheet.Cell(row, usedCol).Value.ToString()?.Trim();
+                }
 
                 if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(surname))
                     continue;
@@ -135,8 +189,8 @@ namespace GeniusContactManager.Services
                 {
                     Name = name ?? "",
                     Surname = surname ?? "",
-                    PhoneNumber = phoneNumber,
-                    Used = ParseBooleanValue(usedValue),
+                    PhoneNumber = phoneNumber ?? "",
+                    Used = hasUsedColumn ? ParseBooleanValue(usedValue) : false, // Set to false if no Used column
                     CreatedDate = DateTime.Now
                 };
 
