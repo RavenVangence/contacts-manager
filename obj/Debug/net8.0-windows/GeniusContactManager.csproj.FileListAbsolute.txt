@@ -138,10 +138,10 @@ C:\Users\lodrickm\Documents\top g\Genius\obj\Debug\net8.0-windows\refint\GeniusC
 C:\Users\lodrickm\Documents\top g\Genius\obj\Debug\net8.0-windows\GeniusContactManager.pdb
 C:\Users\lodrickm\Documents\top g\Genius\obj\Debug\net8.0-windows\GeniusContactManager.genruntimeconfig.cache
 C:\Users\lodrickm\Documents\top g\Genius\obj\Debug\net8.0-windows\ref\GeniusContactManager.dll
-C:\Users\lodrickm\Documents\top g\Genius\bin\Debug\net8.0-windows\GeniusContactManager.dll.config
 C:\Users\lodrickm\Documents\top g\Genius\bin\Debug\net8.0-windows\ClosedXML.dll
 C:\Users\lodrickm\Documents\top g\Genius\bin\Debug\net8.0-windows\DocumentFormat.OpenXml.dll
 C:\Users\lodrickm\Documents\top g\Genius\bin\Debug\net8.0-windows\ExcelNumberFormat.dll
 C:\Users\lodrickm\Documents\top g\Genius\bin\Debug\net8.0-windows\Irony.dll
 C:\Users\lodrickm\Documents\top g\Genius\bin\Debug\net8.0-windows\SixLabors.Fonts.dll
 C:\Users\lodrickm\Documents\top g\Genius\bin\Debug\net8.0-windows\XLParser.dll
+C:\Users\lodrickm\Documents\top g\Genius\obj\Debug\net8.0-windows\GeniusContactManager.sourcelink.json

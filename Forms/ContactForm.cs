@@ -70,7 +70,7 @@ namespace GeniusContactManager.Forms
             return isValid;
         }
 
-        private void ButtonSave_Click(object? sender, EventArgs e)
+        private void ButtonSave_Click(object sender, EventArgs e)
         {
             if (ValidateForm())
             {
@@ -96,7 +96,7 @@ namespace GeniusContactManager.Forms
             }
         }
 
-        private void ButtonCancel_Click(object? sender, EventArgs e)
+        private void ButtonCancel_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Cancel;
             this.Close();

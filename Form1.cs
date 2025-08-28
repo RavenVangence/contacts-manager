@@ -22,6 +22,9 @@ public partial class Form1 : Form
         _context = new ContactContext(new DbContextOptionsBuilder<ContactContext>().Options);
         _excelService = new ExcelService();
 
+        // Add handler for Used checkbox changes
+        dataGridViewContacts.CellValueChanged += DataGridViewContacts_CellValueChanged;
+        
         InitializeForm();
         LoadContacts();
     }
@@ -67,14 +70,30 @@ public partial class Form1 : Form
             dataGridViewContacts.Columns["PhoneNumber"].HeaderText = "Phone Number";
             dataGridViewContacts.Columns["Used"].HeaderText = "Used";
 
+            // Configure Used column as checkbox
+            if (dataGridViewContacts.Columns["Used"] is DataGridViewColumn usedColumn)
+            {
+                var checkboxColumn = new DataGridViewCheckBoxColumn
+                {
+                    Name = "Used",
+                    HeaderText = "Used",
+                    DataPropertyName = "Used",
+                    Width = 80,
+                    ReadOnly = false
+                };
+                
+                int usedColumnIndex = usedColumn.Index;
+                dataGridViewContacts.Columns.RemoveAt(usedColumnIndex);
+                dataGridViewContacts.Columns.Insert(usedColumnIndex, checkboxColumn);
+            }
+
             // Set column widths
             dataGridViewContacts.Columns["Name"].Width = 150;
             dataGridViewContacts.Columns["Surname"].Width = 150;
             dataGridViewContacts.Columns["PhoneNumber"].Width = 150;
-            dataGridViewContacts.Columns["Used"].Width = 80;
         }
 
-        // Apply color coding based on Used field
+        // Apply color coding to rows based on Used field
         ApplyRowColoring();
     }
 
@@ -129,7 +148,7 @@ public partial class Form1 : Form
         RefreshDataGridView();
     }
 
-    private void DataGridViewContacts_ColumnHeaderMouseClick(object? sender, DataGridViewCellMouseEventArgs e)
+    private void DataGridViewContacts_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
     {
         if (e.Button == MouseButtons.Left)
         {
@@ -138,7 +157,7 @@ public partial class Form1 : Form
         }
     }
 
-    private void ButtonAdd_Click(object? sender, EventArgs e)
+    private void ButtonAdd_Click(object sender, EventArgs e)
     {
         var form = new ContactForm();
         if (form.ShowDialog() == DialogResult.OK)
@@ -149,7 +168,7 @@ public partial class Form1 : Form
         }
     }
 
-    private void ButtonEdit_Click(object? sender, EventArgs e)
+    private void ButtonEdit_Click(object sender, EventArgs e)
     {
         if (dataGridViewContacts.CurrentRow?.DataBoundItem is Contact selectedContact)
         {
@@ -169,7 +188,7 @@ public partial class Form1 : Form
         }
     }
 
-    private void ButtonDelete_Click(object? sender, EventArgs e)
+    private void ButtonDelete_Click(object sender, EventArgs e)
     {
         if (dataGridViewContacts.CurrentRow?.DataBoundItem is Contact selectedContact)
         {
@@ -190,7 +209,7 @@ public partial class Form1 : Form
         }
     }
 
-    private void ButtonImport_Click(object? sender, EventArgs e)
+    private void ButtonImport_Click(object sender, EventArgs e)
     {
         using var openFileDialog = new OpenFileDialog
         {
@@ -226,7 +245,7 @@ public partial class Form1 : Form
         }
     }
 
-    private void ButtonExport_Click(object? sender, EventArgs e)
+    private void ButtonExport_Click(object sender, EventArgs e)
     {
         using var saveFileDialog = new SaveFileDialog
         {
@@ -252,54 +271,21 @@ public partial class Form1 : Form
         }
     }
 
-    private void ButtonImportSaContacts_Click(object? sender, EventArgs e)
+    private void DataGridViewContacts_CellValueChanged(object sender, DataGridViewCellEventArgs e)
     {
-        var filePath = Path.Combine(Application.StartupPath, "..", "..", "..", "..", "sa_contacts.xlsx");
-
-        if (!File.Exists(filePath))
+        if (e.ColumnIndex == dataGridViewContacts.Columns["Used"].Index && e.RowIndex >= 0)
         {
-            using var openFileDialog = new OpenFileDialog
+            if (dataGridViewContacts.Rows[e.RowIndex].DataBoundItem is Contact contact)
             {
-                Filter = "Excel files (*.xlsx)|*.xlsx",
-                FilterIndex = 1,
-                Title = "Select sa_contacts.xlsx file",
-                FileName = "sa_contacts.xlsx"
-            };
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                filePath = openFileDialog.FileName;
-            }
-            else
-            {
-                return;
-            }
-        }
-
-        try
-        {
-            var contacts = _excelService.ImportFromSaContacts(filePath);
-
-            var result = MessageBox.Show($"Found {contacts.Count} contacts in sa_contacts.xlsx. Import them?",
-                "Import SA Contacts", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-            if (result == DialogResult.Yes)
-            {
-                _context.Contacts.AddRange(contacts);
+                contact.Used = (bool)dataGridViewContacts.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
+                contact.ModifiedDate = DateTime.Now;
+                _context.Entry(contact).State = EntityState.Modified;
                 _context.SaveChanges();
-                LoadContacts();
-
-                MessageBox.Show($"Successfully imported {contacts.Count} contacts from sa_contacts.xlsx.",
-                    "Import Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ApplyRowColoring(); // Refresh the row colors
             }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error importing sa_contacts.xlsx: {ex.Message}", "Import Error",
-                MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
-
+    
     protected override void OnFormClosing(FormClosingEventArgs e)
     {
         _context?.Dispose();

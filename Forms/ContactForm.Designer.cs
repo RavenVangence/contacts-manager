@@ -160,14 +160,14 @@ namespace GeniusContactManager.Forms
             // 
             // checkBoxUsed
             // 
-            this.checkBoxUsed.Anchor = AnchorStyles.Left;
-            this.checkBoxUsed.AutoSize = true;
-            this.checkBoxUsed.Location = new Point(143, 132);
-            this.checkBoxUsed.Name = "checkBoxUsed";
-            this.checkBoxUsed.Size = new Size(90, 19);
-            this.checkBoxUsed.TabIndex = 7;
-            this.checkBoxUsed.Text = "Contact used";
-            this.checkBoxUsed.UseVisualStyleBackColor = true;
+            //this.checkBoxUsed.Anchor = AnchorStyles.Left;
+            //this.checkBoxUsed.AutoSize = true;
+            //this.checkBoxUsed.Location = new Point(143, 132);
+            //this.checkBoxUsed.Name = "checkBoxUsed";
+            //this.checkBoxUsed.Size = new Size(90, 19);
+            //this.checkBoxUsed.TabIndex = 7;
+            //this.checkBoxUsed.Text = "Contact used";
+            //this.checkBoxUsed.UseVisualStyleBackColor = true;
 
             // 
             // buttonSave

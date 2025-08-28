@@ -12,7 +12,6 @@ partial class Form1
     private Button buttonDelete;
     private Button buttonImport;
     private Button buttonExport;
-    private Button buttonImportSaContacts;
     private MenuStrip menuStrip1;
     private ToolStripMenuItem fileToolStripMenuItem;
     private ToolStripMenuItem importToolStripMenuItem;
@@ -54,7 +53,6 @@ partial class Form1
         this.buttonDelete = new Button();
         this.buttonImport = new Button();
         this.buttonExport = new Button();
-        this.buttonImportSaContacts = new Button();
         this.menuStrip1 = new MenuStrip();
         this.fileToolStripMenuItem = new ToolStripMenuItem();
         this.importToolStripMenuItem = new ToolStripMenuItem();
@@ -125,9 +123,9 @@ partial class Form1
         // editToolStripMenuItem
         // 
         this.editToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] {
-            this.addContactToolStripMenuItem,
-            this.editContactToolStripMenuItem,
-            this.deleteContactToolStripMenuItem});
+        this.addContactToolStripMenuItem,
+        this.editContactToolStripMenuItem,
+        this.deleteContactToolStripMenuItem});
         this.editToolStripMenuItem.Name = "editToolStripMenuItem";
         this.editToolStripMenuItem.Size = new Size(39, 20);
         this.editToolStripMenuItem.Text = "&Edit";
@@ -164,7 +162,6 @@ partial class Form1
         this.panelButtons.Controls.Add(this.buttonDelete);
         this.panelButtons.Controls.Add(this.buttonImport);
         this.panelButtons.Controls.Add(this.buttonExport);
-        this.panelButtons.Controls.Add(this.buttonImportSaContacts);
         this.panelButtons.Dock = DockStyle.Top;
         this.panelButtons.Location = new Point(0, 24);
         this.panelButtons.Name = "panelButtons";
@@ -198,7 +195,7 @@ partial class Form1
         // 
         this.buttonDelete.Location = new Point(224, 12);
         this.buttonDelete.Name = "buttonDelete";
-        this.buttonDelete.Size = new Size(100, 30);
+        this.buttonDelete.Size = new Size(120, 30);  // Increased width to 120
         this.buttonDelete.TabIndex = 2;
         this.buttonDelete.Text = "&Delete Contact";
         this.buttonDelete.UseVisualStyleBackColor = true;
@@ -207,7 +204,7 @@ partial class Form1
         // 
         // buttonImport
         // 
-        this.buttonImport.Location = new Point(350, 12);
+        this.buttonImport.Location = new Point(370, 12);  // Adjusted position to account for wider Delete button
         this.buttonImport.Name = "buttonImport";
         this.buttonImport.Size = new Size(100, 30);
         this.buttonImport.TabIndex = 3;
@@ -218,24 +215,13 @@ partial class Form1
         // 
         // buttonExport
         // 
-        this.buttonExport.Location = new Point(456, 12);
+        this.buttonExport.Location = new Point(476, 12);  // Adjusted position to account for wider Delete button
         this.buttonExport.Name = "buttonExport";
         this.buttonExport.Size = new Size(100, 30);
         this.buttonExport.TabIndex = 4;
         this.buttonExport.Text = "E&xport Excel";
         this.buttonExport.UseVisualStyleBackColor = true;
         this.buttonExport.Click += new EventHandler(this.ButtonExport_Click);
-
-        // 
-        // buttonImportSaContacts
-        // 
-        this.buttonImportSaContacts.Location = new Point(582, 12);
-        this.buttonImportSaContacts.Name = "buttonImportSaContacts";
-        this.buttonImportSaContacts.Size = new Size(130, 30);
-        this.buttonImportSaContacts.TabIndex = 5;
-        this.buttonImportSaContacts.Text = "Import &SA Contacts";
-        this.buttonImportSaContacts.UseVisualStyleBackColor = true;
-        this.buttonImportSaContacts.Click += new EventHandler(this.ButtonImportSaContacts_Click);
 
         // 
         // dataGridViewContacts
@@ -248,9 +234,9 @@ partial class Form1
         this.dataGridViewContacts.Location = new Point(0, 74);
         this.dataGridViewContacts.MultiSelect = false;
         this.dataGridViewContacts.Name = "dataGridViewContacts";
-        this.dataGridViewContacts.ReadOnly = true;
+        this.dataGridViewContacts.EditMode = DataGridViewEditMode.EditOnEnter;
         this.dataGridViewContacts.RowHeadersWidth = 25;
-        this.dataGridViewContacts.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+        this.dataGridViewContacts.SelectionMode = DataGridViewSelectionMode.CellSelect;
         this.dataGridViewContacts.Size = new Size(1000, 584);
         this.dataGridViewContacts.TabIndex = 2;
         this.dataGridViewContacts.ColumnHeaderMouseClick += new DataGridViewCellMouseEventHandler(this.DataGridViewContacts_ColumnHeaderMouseClick);
