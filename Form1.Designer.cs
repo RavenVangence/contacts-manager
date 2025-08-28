@@ -12,10 +12,12 @@ partial class Form1
     private Button buttonDelete;
     private Button buttonImport;
     private Button buttonExport;
+    private Button buttonSaveToDb;
     private MenuStrip menuStrip1;
     private ToolStripMenuItem fileToolStripMenuItem;
     private ToolStripMenuItem importToolStripMenuItem;
     private ToolStripMenuItem exportToolStripMenuItem;
+    private ToolStripMenuItem saveToDbToolStripMenuItem;
     private ToolStripMenuItem exitToolStripMenuItem;
     private ToolStripMenuItem editToolStripMenuItem;
     private ToolStripMenuItem addContactToolStripMenuItem;
@@ -53,10 +55,12 @@ partial class Form1
         this.buttonDelete = new Button();
         this.buttonImport = new Button();
         this.buttonExport = new Button();
+        this.buttonSaveToDb = new Button();
         this.menuStrip1 = new MenuStrip();
         this.fileToolStripMenuItem = new ToolStripMenuItem();
         this.importToolStripMenuItem = new ToolStripMenuItem();
         this.exportToolStripMenuItem = new ToolStripMenuItem();
+        this.saveToDbToolStripMenuItem = new ToolStripMenuItem();
         this.exitToolStripMenuItem = new ToolStripMenuItem();
         this.editToolStripMenuItem = new ToolStripMenuItem();
         this.addContactToolStripMenuItem = new ToolStripMenuItem();
@@ -90,6 +94,7 @@ partial class Form1
         this.fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] {
             this.importToolStripMenuItem,
             this.exportToolStripMenuItem,
+            this.saveToDbToolStripMenuItem,
             this.exitToolStripMenuItem});
         this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
         this.fileToolStripMenuItem.Size = new Size(37, 20);
@@ -110,6 +115,14 @@ partial class Form1
         this.exportToolStripMenuItem.Size = new Size(180, 22);
         this.exportToolStripMenuItem.Text = "&Export to Excel";
         this.exportToolStripMenuItem.Click += new EventHandler(this.ButtonExport_Click);
+
+        // 
+        // saveToDbToolStripMenuItem
+        // 
+        this.saveToDbToolStripMenuItem.Name = "saveToDbToolStripMenuItem";
+        this.saveToDbToolStripMenuItem.Size = new Size(180, 22);
+        this.saveToDbToolStripMenuItem.Text = "&Save to Database";
+        this.saveToDbToolStripMenuItem.Click += new EventHandler(this.ButtonSaveToDb_Click);
 
         // 
         // exitToolStripMenuItem
@@ -162,6 +175,7 @@ partial class Form1
         this.panelButtons.Controls.Add(this.buttonDelete);
         this.panelButtons.Controls.Add(this.buttonImport);
         this.panelButtons.Controls.Add(this.buttonExport);
+        this.panelButtons.Controls.Add(this.buttonSaveToDb);
         this.panelButtons.Dock = DockStyle.Top;
         this.panelButtons.Location = new Point(0, 24);
         this.panelButtons.Name = "panelButtons";
@@ -222,6 +236,17 @@ partial class Form1
         this.buttonExport.Text = "E&xport Excel";
         this.buttonExport.UseVisualStyleBackColor = true;
         this.buttonExport.Click += new EventHandler(this.ButtonExport_Click);
+
+        // 
+        // buttonSaveToDb
+        // 
+        this.buttonSaveToDb.Location = new Point(582, 12);
+        this.buttonSaveToDb.Name = "buttonSaveToDb";
+        this.buttonSaveToDb.Size = new Size(120, 30);
+        this.buttonSaveToDb.TabIndex = 5;
+        this.buttonSaveToDb.Text = "&Save to Database";
+        this.buttonSaveToDb.UseVisualStyleBackColor = true;
+        this.buttonSaveToDb.Click += new EventHandler(this.ButtonSaveToDb_Click);
 
         // 
         // dataGridViewContacts

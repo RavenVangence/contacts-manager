@@ -145,3 +145,4 @@ C:\Users\lodrickm\Documents\top g\Genius\bin\Debug\net8.0-windows\Irony.dll
 C:\Users\lodrickm\Documents\top g\Genius\bin\Debug\net8.0-windows\SixLabors.Fonts.dll
 C:\Users\lodrickm\Documents\top g\Genius\bin\Debug\net8.0-windows\XLParser.dll
 C:\Users\lodrickm\Documents\top g\Genius\obj\Debug\net8.0-windows\GeniusContactManager.sourcelink.json
+C:\Users\lodrickm\Documents\top g\Genius\bin\Debug\net8.0-windows\GeniusContactManager.dll.config

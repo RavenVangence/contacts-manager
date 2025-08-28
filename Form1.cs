@@ -13,6 +13,8 @@ public partial class Form1 : Form
     private List<Contact> _currentContacts = new();
     private string _sortColumn = "Name";
     private bool _sortAscending = true;
+    private bool _columnsInitialized = false;
+    private Dictionary<string, int> _columnWidths = new();
 
     public Form1()
     {
@@ -22,10 +24,13 @@ public partial class Form1 : Form
         _context = new ContactContext(new DbContextOptionsBuilder<ContactContext>().Options);
         _excelService = new ExcelService();
 
-        // Add handler for Used checkbox changes
+        // Add handlers for DataGridView events
         dataGridViewContacts.CellValueChanged += DataGridViewContacts_CellValueChanged;
-        
+        dataGridViewContacts.DataBindingComplete += DataGridViewContacts_DataBindingComplete;
+        dataGridViewContacts.ColumnWidthChanged += DataGridViewContacts_ColumnWidthChanged;
+
         InitializeForm();
+        InitializeDataGridView();
         LoadContacts();
     }
 
@@ -34,6 +39,65 @@ public partial class Form1 : Form
         this.Text = "Genius Contact Manager";
         this.Size = new Size(1000, 700);
         this.StartPosition = FormStartPosition.CenterScreen;
+    }
+
+    private void InitializeDataGridView()
+    {
+        if (_columnsInitialized) return;
+
+        // Configure DataGridView properties
+        dataGridViewContacts.AutoGenerateColumns = false;
+        dataGridViewContacts.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None;
+        dataGridViewContacts.AllowUserToResizeRows = false;
+        dataGridViewContacts.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
+        // Clear existing columns
+        dataGridViewContacts.Columns.Clear();
+
+        // Add columns in specific order with explicit configuration
+        dataGridViewContacts.Columns.AddRange(new DataGridViewColumn[]
+        {
+            new DataGridViewTextBoxColumn
+            {
+                Name = "Name",
+                DataPropertyName = "Name",
+                HeaderText = "Name",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+                FillWeight = 30
+            },
+            new DataGridViewTextBoxColumn
+            {
+                Name = "Surname",
+                DataPropertyName = "Surname",
+                HeaderText = "Surname",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+                FillWeight = 30
+            },
+            new DataGridViewTextBoxColumn
+            {
+                Name = "PhoneNumber",
+                DataPropertyName = "PhoneNumber",
+                HeaderText = "Phone Number",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+                FillWeight = 30
+            },
+            new DataGridViewCheckBoxColumn
+            {
+                Name = "Used",
+                DataPropertyName = "Used",
+                HeaderText = "Used",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+                FillWeight = 10
+            }
+        });
+
+        // Ensure all columns are properly sized and visible
+        foreach (DataGridViewColumn col in dataGridViewContacts.Columns)
+        {
+            col.Visible = true;
+        }
+
+        _columnsInitialized = true;
     }
 
     private void LoadContacts()
@@ -52,67 +116,72 @@ public partial class Form1 : Form
 
     private void RefreshDataGridView()
     {
+        // Ensure columns are initialized
+        InitializeDataGridView();
+
+        // Save current column widths before rebinding
+        SaveColumnWidths();
+
+        // Bind the data without recreating columns
         dataGridViewContacts.DataSource = null;
         dataGridViewContacts.DataSource = _currentContacts;
 
-        // Configure columns
-        if (dataGridViewContacts.Columns.Count > 0)
+        // Restore column widths after rebinding
+        RestoreColumnWidths();
+
+        dataGridViewContacts.Refresh();
+    }
+
+    private void SaveColumnWidths()
+    {
+        if (!_columnsInitialized) return;
+
+        foreach (DataGridViewColumn column in dataGridViewContacts.Columns)
         {
-            dataGridViewContacts.Columns["Id"].Visible = false;
-            dataGridViewContacts.Columns["CreatedDate"].Visible = false;
-            dataGridViewContacts.Columns["ModifiedDate"].Visible = false;
-            dataGridViewContacts.Columns["FullName"].Visible = false;
-            dataGridViewContacts.Columns["DisplayText"].Visible = false;
-
-            // Set column headers
-            dataGridViewContacts.Columns["Name"].HeaderText = "Name";
-            dataGridViewContacts.Columns["Surname"].HeaderText = "Surname";
-            dataGridViewContacts.Columns["PhoneNumber"].HeaderText = "Phone Number";
-            dataGridViewContacts.Columns["Used"].HeaderText = "Used";
-
-            // Configure Used column as checkbox
-            if (dataGridViewContacts.Columns["Used"] is DataGridViewColumn usedColumn)
-            {
-                var checkboxColumn = new DataGridViewCheckBoxColumn
-                {
-                    Name = "Used",
-                    HeaderText = "Used",
-                    DataPropertyName = "Used",
-                    Width = 80,
-                    ReadOnly = false
-                };
-                
-                int usedColumnIndex = usedColumn.Index;
-                dataGridViewContacts.Columns.RemoveAt(usedColumnIndex);
-                dataGridViewContacts.Columns.Insert(usedColumnIndex, checkboxColumn);
-            }
-
-            // Set column widths
-            dataGridViewContacts.Columns["Name"].Width = 150;
-            dataGridViewContacts.Columns["Surname"].Width = 150;
-            dataGridViewContacts.Columns["PhoneNumber"].Width = 150;
+            _columnWidths[column.Name] = column.Width;
         }
+    }
 
-        // Apply color coding to rows based on Used field
+    private void RestoreColumnWidths()
+    {
+        if (!_columnsInitialized) return;
+
+        foreach (DataGridViewColumn column in dataGridViewContacts.Columns)
+        {
+            if (_columnWidths.ContainsKey(column.Name))
+            {
+                column.Width = _columnWidths[column.Name];
+            }
+        }
+    }
+
+    private void DataGridViewContacts_DataBindingComplete(object? sender, DataGridViewBindingCompleteEventArgs e)
+    {
+        // Apply color coding after data binding is complete
         ApplyRowColoring();
+    }
+
+    private void DataGridViewContacts_ColumnWidthChanged(object? sender, DataGridViewColumnEventArgs e)
+    {
+        // Save the new column width when user resizes columns
+        if (_columnsInitialized && e.Column != null)
+        {
+            _columnWidths[e.Column.Name] = e.Column.Width;
+        }
     }
 
     private void ApplyRowColoring()
     {
+        if (dataGridViewContacts.Rows.Count == 0) return;
+
         foreach (DataGridViewRow row in dataGridViewContacts.Rows)
         {
             if (row.DataBoundItem is Contact contact)
             {
-                if (contact.Used)
-                {
-                    row.DefaultCellStyle.BackColor = Color.LightCoral; // Red for used
-                }
-                else
-                {
-                    row.DefaultCellStyle.BackColor = Color.LightGreen; // Green for not used
-                }
+                row.DefaultCellStyle.BackColor = contact.Used ? Color.LightCoral : Color.LightGreen;
             }
         }
+        dataGridViewContacts.Refresh();
     }
 
     private Func<Contact, object> GetSortExpression()
@@ -271,7 +340,74 @@ public partial class Form1 : Form
         }
     }
 
-    private void DataGridViewContacts_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+    private void ButtonSaveToDb_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            var result = MessageBox.Show($"This will save all current contacts to the database and remove duplicates. Continue?",
+                "Save to Database", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                int savedCount = 0;
+                int duplicateCount = 0;
+
+                // Get all existing contacts from database for duplicate checking
+                var existingContacts = _context.Contacts.ToList();
+
+                foreach (var contact in _currentContacts)
+                {
+                    // Check for duplicates based on Name, Surname, and PhoneNumber
+                    var isDuplicate = existingContacts.Any(ec =>
+                        ec.Name.Equals(contact.Name, StringComparison.OrdinalIgnoreCase) &&
+                        ec.Surname.Equals(contact.Surname, StringComparison.OrdinalIgnoreCase) &&
+                        ((string.IsNullOrEmpty(ec.PhoneNumber) && string.IsNullOrEmpty(contact.PhoneNumber)) ||
+                         (!string.IsNullOrEmpty(ec.PhoneNumber) && !string.IsNullOrEmpty(contact.PhoneNumber) &&
+                          ec.PhoneNumber.Equals(contact.PhoneNumber, StringComparison.OrdinalIgnoreCase))));
+
+                    if (!isDuplicate)
+                    {
+                        // Check if the contact is already being tracked by EF
+                        var existingEntry = _context.Entry(contact);
+                        if (existingEntry.State == EntityState.Detached)
+                        {
+                            // Set dates if they're not already set
+                            if (contact.CreatedDate == default)
+                                contact.CreatedDate = DateTime.Now;
+
+                            contact.ModifiedDate = DateTime.Now;
+
+                            _context.Contacts.Add(contact);
+                            savedCount++;
+                        }
+                        else if (existingEntry.State == EntityState.Modified)
+                        {
+                            // Contact is already tracked and modified
+                            contact.ModifiedDate = DateTime.Now;
+                            savedCount++;
+                        }
+                    }
+                    else
+                    {
+                        duplicateCount++;
+                    }
+                }
+
+                _context.SaveChanges();
+                LoadContacts(); // Refresh the display
+
+                MessageBox.Show($"Save complete!\nSaved: {savedCount} contacts\nSkipped duplicates: {duplicateCount}",
+                    "Save to Database Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error saving to database: {ex.Message}", "Save Error",
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private void DataGridViewContacts_CellValueChanged(object? sender, DataGridViewCellEventArgs e)
     {
         if (e.ColumnIndex == dataGridViewContacts.Columns["Used"].Index && e.RowIndex >= 0)
         {
@@ -285,7 +421,7 @@ public partial class Form1 : Form
             }
         }
     }
-    
+
     protected override void OnFormClosing(FormClosingEventArgs e)
     {
         _context?.Dispose();
